@@ -198,14 +198,16 @@ function TemplatesPage({ favoritesOnly = false }) {
 
   return (
     <main className="mx-auto max-w-7xl px-5 py-10">
-      <section className="mb-9 rounded-3xl bg-gradient-to-br from-indigo-700 to-violet-500 px-7 py-10 text-white md:px-12 md:py-14">
-        <p className="mb-3 text-sm font-bold uppercase tracking-widest text-indigo-200">
+      
+<section className="relative mb-10 overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-indigo-950 to-violet-800 px-7 py-12 text-white shadow-xl shadow-indigo-200/40 sm:px-10 md:px-14 md:py-16">
+
+        <p className="mb-4 text-xs font-extrabold uppercase tracking-[0.25em] text-indigo-200 sm:text-sm">
           Discover · Create · Launch
         </p>
-        <h1 className="max-w-2xl text-4xl font-black leading-tight md:text-5xl">
+        <h1 className="max-w-2xl text-4xl font-black leading-tight tracking-tight md:text-5xl lg:text-6xl">
           Find the perfect template for your next big idea.
         </h1>
-        <p className="mt-4 max-w-xl text-indigo-100">
+        <p className="mt-5 max-w-xl text-base leading-7 text-indigo-100 md:text-lg">
           Explore beautiful website templates for portfolios, businesses, shops and more.
         </p>
         <p className="mt-5 text-sm font-semibold">
@@ -214,29 +216,52 @@ function TemplatesPage({ favoritesOnly = false }) {
       </section>
 
       <div className="mb-7 flex flex-col gap-3 md:flex-row">
-        <input placeholder="Search templates..." value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="min-w-0 flex-1 rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-indigo-500" />
+        
+<input
+  placeholder="Search templates..."
+  value={search}
+  onChange={(e) => setSearch(e.target.value)}
+  className="min-w-0 flex-1 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+/>
         <select value={category} onChange={(e) => setCategory(e.target.value)}
-          className="rounded-xl border border-slate-300 bg-white px-4 py-3">
+          className="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100">
           {categories.map((c) => <option key={c}>{c}</option>)}
         </select>
       </div>
 
       <div className="mb-5 flex items-center justify-between">
         <h2 className="text-2xl font-black">{favoritesOnly ? "My Favorites" : "Explore Templates"}</h2>
-        <span className="text-sm text-slate-500">{filtered.length} templates</span>
+        
+<span className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 shadow-sm">
+  {filtered.length} {filtered.length === 1 ? "template" : "templates"}
+</span>
+
       </div>
 
       {error && <p role="alert" className="mb-5 rounded-xl bg-red-50 p-4 text-red-700">{error}</p>}
       {loading ? <p className="py-12 text-center text-slate-500">Loading templates...</p> :
-        filtered.length === 0 ? <div className="rounded-2xl border border-dashed border-slate-300 p-12 text-center text-slate-500">No templates found.</div> :
+        filtered.length === 0 ? 
+<div className="rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center shadow-sm">
+  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 text-2xl">
+    🔎
+  </div>
+  <h3 className="text-lg font-bold text-slate-900">
+    No templates found
+  </h3>
+  <p className="mt-2 text-sm text-slate-500">
+    Try a different search term or select another category.
+  </p>
+</div>
+ :
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((template) => (
-            <article key={template.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:-translate-y-1 hover:shadow-lg">
+            <article
+  key={template.id}
+  className="group overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-100/60"
+>
               <img src={template.thumbnail_url} alt={template.name}
-                className="h-52 w-full object-cover" loading="lazy" />
-              <div className="p-5">
+                className="h-52 w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+              <div className="p-6">
                 <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-700">{template.category}</span>
                 <h3 className="mt-4 text-xl font-bold">{template.name}</h3>
                 <p className="mt-2 min-h-12 text-sm leading-6 text-slate-500">{template.description}</p>
