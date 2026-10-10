@@ -23,38 +23,100 @@ const db = knex({
   useNullAsDefault: true,
 });
 
+
 const sampleTemplates = [
   {
     name: "Portfolio Pro",
-    description: "A modern portfolio for developers and designers.",
-    thumbnail_url: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600",
+    description: "A polished personal portfolio for developers, designers, and creative professionals.",
+    thumbnail_url: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=80",
+    category: "Portfolio",
+  },
+  {
+    name: "Creative Studio",
+    description: "A bold portfolio for creative agencies showcasing projects and case studies.",
+    thumbnail_url: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800&auto=format&fit=crop&q=80",
+    category: "Portfolio",
+  },
+  {
+    name: "DevFolio",
+    description: "A developer portfolio featuring skills, projects, experience, and contact details.",
+    thumbnail_url: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop&q=80",
     category: "Portfolio",
   },
   {
     name: "ShopWave",
-    description: "A clean online store template for your products.",
-    thumbnail_url: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600",
+    description: "A modern e-commerce storefront for showcasing products and collections.",
+    thumbnail_url: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&auto=format&fit=crop&q=80",
+    category: "E-commerce",
+  },
+  {
+    name: "Luxe Boutique",
+    description: "An elegant storefront concept for fashion, accessories, and lifestyle brands.",
+    thumbnail_url: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&auto=format&fit=crop&q=80",
+    category: "E-commerce",
+  },
+  {
+    name: "Gadget Grid",
+    description: "A clean product catalog layout for electronics and technology stores.",
+    thumbnail_url: "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=800&auto=format&fit=crop&q=80",
     category: "E-commerce",
   },
   {
     name: "Startup Launch",
-    description: "A landing page for startups and new products.",
-    thumbnail_url: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=600",
+    description: "A conversion-focused landing page for startups and new products.",
+    thumbnail_url: "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=800&auto=format&fit=crop&q=80",
+    category: "Business",
+  },
+  {
+    name: "ConsultPro",
+    description: "A professional business website for consultants and service providers.",
+    thumbnail_url: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&auto=format&fit=crop&q=80",
+    category: "Business",
+  },
+  {
+    name: "Agency Prime",
+    description: "A modern agency landing page for presenting services, teams, and client work.",
+    thumbnail_url: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800&auto=format&fit=crop&q=80",
     category: "Business",
   },
   {
     name: "Foodie",
-    description: "A stylish website for restaurants and cafes.",
-    thumbnail_url: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600",
+    description: "A welcoming restaurant website featuring food, atmosphere, and menus.",
+    thumbnail_url: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop&q=80",
+    category: "Restaurant",
+  },
+  {
+    name: "Cafe Corner",
+    description: "A warm cafe website concept for displaying drinks, opening hours, and location.",
+    thumbnail_url: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&auto=format&fit=crop&q=80",
     category: "Restaurant",
   },
   {
     name: "LearnHub",
-    description: "An online learning platform template.",
-    thumbnail_url: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=600",
+    description: "An online learning platform concept for courses, instructors, and students.",
+    thumbnail_url: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=800&auto=format&fit=crop&q=80",
     category: "Education",
   },
+  {
+    name: "CourseCraft",
+    description: "A course landing page with a focus on learning paths and course discovery.",
+    thumbnail_url: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop&q=80",
+    category: "Education",
+  },
+  {
+    name: "Journal",
+    description: "A minimal editorial blog layout for articles, stories, and personal writing.",
+    thumbnail_url: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&auto=format&fit=crop&q=80",
+    category: "Blog",
+  },
+  {
+    name: "Travel Stories",
+    description: "A visual travel blog concept for destinations, photography, and travel guides.",
+    thumbnail_url: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&auto=format&fit=crop&q=80",
+    category: "Blog",
+  },
 ];
+
 
 async function initializeDatabase() {
   if (!(await db.schema.hasTable("users"))) {
@@ -88,9 +150,18 @@ async function initializeDatabase() {
     });
   }
 
-  if ((await db("templates").count({ total: "*" }).first()).total === 0) {
-    await db("templates").insert(sampleTemplates);
-  }
+
+const existingTemplates = await db("templates").select("name");
+const existingNames = new Set(existingTemplates.map((t) => t.name));
+
+const newTemplates = sampleTemplates.filter(
+  (template) => !existingNames.has(template.name)
+);
+
+if (newTemplates.length > 0) {
+  await db("templates").insert(newTemplates);
+}
+
 
   console.log("Database initialized.");
 }

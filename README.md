@@ -1,6 +1,6 @@
 # TemplateHub — Mini SaaS Template Store
 
-A full-stack web application that allows users to register, log in, browse website templates, and manage their favorite templates.
+A full-stack web application that allows users to register, log in, browse website templates, view template details, and manage their favorite templates.
 
 ## Features
 - User registration and login
@@ -60,6 +60,21 @@ npm run dev
 ```
 
 Frontend URL: `http://localhost:5173`
+## Application Routes
+
+- `/register` — Create a new account
+- `/login` — Sign in to your account
+- `/templates` — Browse, search, filter, and sort templates
+- `/favorites` — View and manage your favorite templates (login required)
+
+## How to Use
+
+1. Start the backend and frontend using the installation instructions above.
+2. Open `http://localhost:5173` in your browser.
+3. Register a new account or log in.
+4. Browse the available templates and open their details.
+5. Add templates to your favorites and visit the Favorites page to manage them.
+6. Log out when finished.
 
 ## API Endpoints
 
