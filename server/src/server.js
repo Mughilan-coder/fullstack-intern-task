@@ -27,91 +27,91 @@ const db = knex({
 const sampleTemplates = [
   {
     name: "Portfolio Pro",
-    description: "A polished personal portfolio for developers, designers, and creative professionals.",
+    description: "A polished personal portfolio designed for developers, designers, and creative professionals. Showcase projects, technical skills, work experience, achievements, and contact information in a professional layout that helps attract recruiters and clients.",
     thumbnail_url: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=80",
     category: "Portfolio",
   },
   {
     name: "Creative Studio",
-    description: "A bold portfolio for creative agencies showcasing projects and case studies.",
+    description: "A bold, visually engaging portfolio for creative agencies and design studios. Highlight completed projects, creative processes, case studies, team expertise, and services to communicate your brand's identity and attract potential clients.",
     thumbnail_url: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800&auto=format&fit=crop&q=80",
     category: "Portfolio",
   },
   {
     name: "DevFolio",
-    description: "A developer portfolio featuring skills, projects, experience, and contact details.",
+    description: "A developer-focused portfolio for presenting technical skills, personal projects, professional experience, and GitHub or other relevant links. Ideal for students, software engineers, and freelancers who want to demonstrate their capabilities to recruiters and clients.",
     thumbnail_url: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop&q=80",
     category: "Portfolio",
   },
   {
     name: "ShopWave",
-    description: "A modern e-commerce storefront for showcasing products and collections.",
+    description: "A modern e-commerce storefront for showcasing products and collections. Its layout is suited to product categories, promotional banners, featured items, and shopping-focused navigation for businesses building an online retail presence.",
     thumbnail_url: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&auto=format&fit=crop&q=80",
     category: "E-commerce",
   },
   {
     name: "Luxe Boutique",
-    description: "An elegant storefront concept for fashion, accessories, and lifestyle brands.",
+    description: "An elegant storefront concept for fashion, accessories, and lifestyle brands. Present product collections, seasonal launches, featured items, and promotional content through a refined design suited to boutique businesses and premium retail brands.",
     thumbnail_url: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&auto=format&fit=crop&q=80",
     category: "E-commerce",
   },
   {
     name: "Gadget Grid",
-    description: "A clean product catalog layout for electronics and technology stores.",
+    description: "A clean product catalog concept for electronics and technology stores. Organize gadgets by category and highlight product images, specifications, key features, and promotions to help customers discover and compare products.",
     thumbnail_url: "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=800&auto=format&fit=crop&q=80",
     category: "E-commerce",
   },
   {
     name: "Startup Launch",
-    description: "A conversion-focused landing page for startups and new products.",
+    description: "A conversion-focused landing page for startups and new products. Introduce your value proposition, explain key benefits, showcase product features, establish credibility, and guide visitors toward sign-up or enquiry actions.",
     thumbnail_url: "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=800&auto=format&fit=crop&q=80",
     category: "Business",
   },
   {
     name: "ConsultPro",
-    description: "A professional business website for consultants and service providers.",
+    description: "A professional business website for consultants and service providers. Present consulting services, areas of expertise, business experience, client benefits, and contact options to help potential customers understand your offering and get in touch.",
     thumbnail_url: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&auto=format&fit=crop&q=80",
     category: "Business",
   },
   {
     name: "Agency Prime",
-    description: "A modern agency landing page for presenting services, teams, and client work.",
+    description: "A modern agency website for presenting services, teams, and client work. Showcase case studies, creative capabilities, company strengths, and project highlights in a structured layout designed to build trust with prospective clients.",
     thumbnail_url: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800&auto=format&fit=crop&q=80",
     category: "Business",
   },
   {
     name: "Foodie",
-    description: "A welcoming restaurant website featuring food, atmosphere, and menus.",
+    description: "A welcoming restaurant website concept featuring menu highlights, food photography, restaurant ambience, and essential visitor information. Suitable for restaurants that want to showcase their cuisine, communicate their identity, and encourage customers to visit.",
     thumbnail_url: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop&q=80",
     category: "Restaurant",
   },
   {
     name: "Cafe Corner",
-    description: "A warm cafe website concept for displaying drinks, opening hours, and location.",
+    description: "A warm cafe website concept for presenting drinks, food menus, opening hours, location, and the cafe's atmosphere. Ideal for independent coffee shops and cafes that want to help customers discover their offerings and plan a visit.",
     thumbnail_url: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&auto=format&fit=crop&q=80",
     category: "Restaurant",
   },
   {
     name: "LearnHub",
-    description: "An online learning platform concept for courses, instructors, and students.",
+    description: "An online learning platform concept for organizing courses, introducing instructors, and guiding students toward educational resources. Suitable for training providers and online academies that want to present learning opportunities in a clear, accessible format.",
     thumbnail_url: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=800&auto=format&fit=crop&q=80",
     category: "Education",
   },
   {
     name: "CourseCraft",
-    description: "A course landing page with a focus on learning paths and course discovery.",
+    description: "A course landing page designed to improve course discovery and explain learning outcomes. Highlight course content, intended learners, instructor information, and learning paths to help prospective students choose relevant educational programs.",
     thumbnail_url: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop&q=80",
     category: "Education",
   },
   {
     name: "Journal",
-    description: "A minimal editorial blog layout for articles, stories, and personal writing.",
+    description: "A minimal editorial blog layout for publishing articles, personal stories, opinions, and informative content. Designed to keep the reading experience clear and organized, making it suitable for writers, bloggers, and independent publishers.",
     thumbnail_url: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&auto=format&fit=crop&q=80",
     category: "Blog",
   },
   {
     name: "Travel Stories",
-    description: "A visual travel blog concept for destinations, photography, and travel guides.",
+    description: "A visual travel blog concept for sharing destination guides, travel experiences, photography, and itinerary ideas. Suitable for travel bloggers and creators who want to inspire readers and organize travel content by destination or theme.",
     thumbnail_url: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&auto=format&fit=crop&q=80",
     category: "Blog",
   },
@@ -151,15 +151,18 @@ async function initializeDatabase() {
   }
 
 
-const existingTemplates = await db("templates").select("name");
-const existingNames = new Set(existingTemplates.map((t) => t.name));
+for (const template of sampleTemplates) {
+  const existing = await db("templates")
+    .where({ name: template.name })
+    .first();
 
-const newTemplates = sampleTemplates.filter(
-  (template) => !existingNames.has(template.name)
-);
-
-if (newTemplates.length > 0) {
-  await db("templates").insert(newTemplates);
+  if (existing) {
+    await db("templates")
+      .where({ name: template.name })
+      .update({ description: template.description });
+  } else {
+    await db("templates").insert(template);
+  }
 }
 
 
