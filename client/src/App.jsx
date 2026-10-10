@@ -25,12 +25,37 @@ function Protected({ children }) {
 
 function Navbar() {
   const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem("token"));
+  const [favoriteCount, setFavoriteCount] = useState(0);
 
-  useEffect(() => {
-    const update = () => setLoggedIn(!!localStorage.getItem("token"));
-    window.addEventListener("auth-change", update);
-    return () => window.removeEventListener("auth-change", update);
-  }, []);
+
+useEffect(() => {
+  const update = () => {
+    const token = localStorage.getItem("token");
+    setLoggedIn(!!token);
+
+    if (!token) {
+      setFavoriteCount(0);
+      return;
+    }
+
+    axios
+      .get("http://localhost:5001/api/favorites", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then(({ data }) => setFavoriteCount(data.length))
+      .catch(() => setFavoriteCount(0));
+  };
+
+  update();
+  window.addEventListener("auth-change", update);
+  window.addEventListener("favorites-change", update);
+
+return () => {
+  window.removeEventListener("auth-change", update);
+  window.removeEventListener("favorites-change", update);
+};
+}, []);
+
 
   function logout() {
     localStorage.removeItem("token");
@@ -49,7 +74,17 @@ function Navbar() {
           <Link to="/templates" className="hover:text-indigo-600">Explore</Link>
           {loggedIn ? (
             <>
-              <Link to="/favorites" className="hover:text-indigo-600">My Favorites ♥</Link>
+
+<Link
+  to="/favorites"
+  className="inline-flex items-center gap-2 transition hover:text-indigo-600"
+>
+  My Favorites
+  <span className="inline-flex min-w-6 items-center justify-center rounded-full bg-pink-100 px-2 py-1 text-xs font-bold text-pink-700">
+    {favoriteCount}
+  </span>
+</Link>
+
               <button onClick={logout} className="rounded-xl bg-slate-900 px-4 py-2 text-white">
                 Logout
               </button>
@@ -148,8 +183,28 @@ function TemplatesPage({ favoritesOnly = false }) {
   const [templates, setTemplates] = useState([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
+  const [sortBy, setSortBy] = useState("featured");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [notice, setNotice] = useState("");
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+
+useEffect(() => {
+  if (!selectedTemplate) return;
+
+  function handleEscape(event) {
+    if (event.key === "Escape") {
+      setSelectedTemplate(null);
+    }
+  }
+
+  window.addEventListener("keydown", handleEscape);
+
+  return () => {
+    window.removeEventListener("keydown", handleEscape);
+  };
+}, [selectedTemplate]);
+
 
   async function loadTemplates() {
     setLoading(true);
@@ -179,33 +234,67 @@ function TemplatesPage({ favoritesOnly = false }) {
       return;
     }
     try {
-      if (template.isFavorite) {
-        await api.delete(`/favorites/${template.id}`);
-      } else {
-        await api.post(`/favorites/${template.id}`);
-      }
-      await loadTemplates();
+
+if (template.isFavorite) {
+  await api.delete(`/favorites/${template.id}`);
+  setNotice(`${template.name} removed from favorites.`);
+} else {
+  await api.post(`/favorites/${template.id}`);
+  setNotice(`${template.name} added to favorites!`);
+}
+
+
+  const updatedIsFavorite = !template.isFavorite;
+
+  setSelectedTemplate((current) =>
+    current?.id === template.id
+      ? { ...current, isFavorite: updatedIsFavorite }
+      : current
+  );
+
+  await loadTemplates();
+  window.dispatchEvent(new Event("favorites-change"));
+
     } catch (err) {
       setError(err.response?.data?.message || "Could not update favorite.");
     }
   }
 
   const categories = ["All", ...new Set(templates.map((t) => t.category))];
-  const filtered = templates.filter((t) =>
-    (category === "All" || t.category === category) &&
-    `${t.name} ${t.description}`.toLowerCase().includes(search.toLowerCase())
-  );
+
+const filtered = templates
+  .filter(
+    (t) =>
+      (category === "All" || t.category === category) &&
+      `${t.name} ${t.description}`
+        .toLowerCase()
+        .includes(search.toLowerCase())
+  )
+  .sort((a, b) => {
+    if (sortBy === "az") {
+      return a.name.localeCompare(b.name);
+    }
+
+    if (sortBy === "za") {
+      return b.name.localeCompare(a.name);
+    }
+
+    return 0;
+  });
+
 
   return (
     <main className="mx-auto max-w-7xl px-5 py-10">
-      <section className="mb-9 rounded-3xl bg-gradient-to-br from-indigo-700 to-violet-500 px-7 py-10 text-white md:px-12 md:py-14">
-        <p className="mb-3 text-sm font-bold uppercase tracking-widest text-indigo-200">
+
+<section className="relative mb-10 overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-indigo-950 to-violet-800 px-7 py-12 text-white shadow-xl shadow-indigo-200/40 sm:px-10 md:px-14 md:py-16">
+
+        <p className="mb-4 text-xs font-extrabold uppercase tracking-[0.25em] text-indigo-200 sm:text-sm">
           Discover · Create · Launch
         </p>
-        <h1 className="max-w-2xl text-4xl font-black leading-tight md:text-5xl">
+        <h1 className="max-w-2xl text-4xl font-black leading-tight tracking-tight md:text-5xl lg:text-6xl">
           Find the perfect template for your next big idea.
         </h1>
-        <p className="mt-4 max-w-xl text-indigo-100">
+        <p className="mt-5 max-w-xl text-base leading-7 text-indigo-100 md:text-lg">
           Explore beautiful website templates for portfolios, businesses, shops and more.
         </p>
         <p className="mt-5 text-sm font-semibold">
@@ -213,42 +302,197 @@ function TemplatesPage({ favoritesOnly = false }) {
         </p>
       </section>
 
-      <div className="mb-7 flex flex-col gap-3 md:flex-row">
-        <input placeholder="Search templates..." value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="min-w-0 flex-1 rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-indigo-500" />
-        <select value={category} onChange={(e) => setCategory(e.target.value)}
-          className="rounded-xl border border-slate-300 bg-white px-4 py-3">
-          {categories.map((c) => <option key={c}>{c}</option>)}
-        </select>
-      </div>
+
+<div className="mb-7 space-y-4">
+  <div className="flex flex-col gap-3 sm:flex-row">
+    <div className="relative min-w-0 flex-1">
+      <input
+        placeholder="Search templates..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="w-full rounded-2xl border border-slate-200 bg-white px-5 py-4 pr-12 shadow-sm transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+      />
+
+      {search && (
+        <button
+          type="button"
+          onClick={() => setSearch("")}
+          aria-label="Clear search"
+          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg px-2 py-1 text-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+        >
+          ×
+        </button>
+      )}
+    </div>
+
+
+<select
+  value={sortBy}
+  onChange={(e) => setSortBy(e.target.value)}
+  aria-label="Sort templates"
+  className="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
+>
+  <option value="featured">Featured</option>
+  <option value="az">Name: A–Z</option>
+  <option value="za">Name: Z–A</option>
+</select>
+
+  </div>
+
+  <div className="flex flex-wrap gap-2">
+    {categories.map((c) => (
+      <button
+        key={c}
+        type="button"
+        onClick={() => setCategory(c)}
+        aria-pressed={category === c}
+        className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+          category === c
+            ? "border-indigo-600 bg-indigo-600 text-white shadow-sm"
+            : "border-slate-200 bg-white text-slate-600 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700"
+        }`}
+      >
+        {c === "All" ? "All templates" : c}
+      </button>
+    ))}
+  </div>
+</div>
+
 
       <div className="mb-5 flex items-center justify-between">
         <h2 className="text-2xl font-black">{favoritesOnly ? "My Favorites" : "Explore Templates"}</h2>
-        <span className="text-sm text-slate-500">{filtered.length} templates</span>
+
+<span className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 shadow-sm">
+  {filtered.length} {filtered.length === 1 ? "template" : "templates"}
+</span>
+
       </div>
 
       {error && <p role="alert" className="mb-5 rounded-xl bg-red-50 p-4 text-red-700">{error}</p>}
+
+{notice && (
+  <p
+    role="status"
+    aria-live="polite"
+    className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800"
+  >
+    {notice}
+  </p>
+)}
+
       {loading ? <p className="py-12 text-center text-slate-500">Loading templates...</p> :
-        filtered.length === 0 ? <div className="rounded-2xl border border-dashed border-slate-300 p-12 text-center text-slate-500">No templates found.</div> :
+        filtered.length === 0 ?
+<div className="rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center shadow-sm">
+  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 text-2xl">
+    🔎
+  </div>
+  <h3 className="text-lg font-bold text-slate-900">
+    No templates found
+  </h3>
+  <p className="mt-2 text-sm text-slate-500">
+    Try a different search term or select another category.
+  </p>
+</div>
+ :
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((template) => (
-            <article key={template.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:-translate-y-1 hover:shadow-lg">
+            <article
+  key={template.id}
+  className="group overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-100/60"
+>
               <img src={template.thumbnail_url} alt={template.name}
-                className="h-52 w-full object-cover" loading="lazy" />
-              <div className="p-5">
+                className="h-52 w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+              <div className="p-6">
                 <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-700">{template.category}</span>
                 <h3 className="mt-4 text-xl font-bold">{template.name}</h3>
                 <p className="mt-2 min-h-12 text-sm leading-6 text-slate-500">{template.description}</p>
-                <button onClick={() => toggleFavorite(template)}
-                  className={`mt-5 w-full rounded-xl px-4 py-3 text-sm font-bold ${template.isFavorite ? "bg-pink-50 text-pink-700" : "bg-slate-900 text-white hover:bg-indigo-600"}`}>
-                  {template.isFavorite ? "♥ Remove from Favorites" : "♡ Add to Favorites"}
-                </button>
+
+
+<button
+  type="button"
+  onClick={() => setSelectedTemplate(template)}
+  className="mt-5 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700"
+>
+  View Details
+</button>
+
+<button
+  onClick={() => toggleFavorite(template)}
+  className={`mt-5 flex w-full items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-bold transition-all duration-200 active:scale-[0.98] ${
+    template.isFavorite
+      ? "border-pink-200 bg-pink-50 text-pink-700 hover:border-pink-300 hover:bg-pink-100"
+      : "border-slate-900 bg-slate-900 text-white hover:border-indigo-600 hover:bg-indigo-600"
+  }`}
+>
+  {template.isFavorite ? "♥ Saved to Favorites" : "♡ Add to Favorites"}
+</button>
+
               </div>
             </article>
           ))}
         </div>
       }
+      {/* Template Preview Modal */}
+      {selectedTemplate && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm"
+          onClick={() => setSelectedTemplate(null)}
+        >
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="template-preview-title"
+            className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setSelectedTemplate(null)}
+              aria-label="Close template preview"
+              className="absolute right-4 top-4 z-10 rounded-full bg-white/95 px-3 py-2 text-xl font-bold text-slate-700 shadow hover:bg-slate-100"
+            >
+              ×
+            </button>
+
+            <img
+              src={selectedTemplate.thumbnail_url}
+              alt={selectedTemplate.name}
+              className="h-64 w-full object-cover sm:h-80"
+            />
+
+            <div className="p-6 sm:p-8">
+              <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-700">
+                {selectedTemplate.category}
+              </span>
+
+              <h2
+                id="template-preview-title"
+                className="mt-4 text-3xl font-black tracking-tight text-slate-900"
+              >
+                {selectedTemplate.name}
+              </h2>
+
+              <p className="mt-4 leading-7 text-slate-600">
+                {selectedTemplate.description}
+              </p>
+
+              <button
+                type="button"
+                onClick={() => toggleFavorite(selectedTemplate)}
+                className={`mt-6 w-full rounded-xl px-5 py-3 font-bold transition ${
+                  selectedTemplate.isFavorite
+                    ? "bg-pink-50 text-pink-700 hover:bg-pink-100"
+                    : "bg-indigo-600 text-white hover:bg-indigo-700"
+                }`}
+              >
+                {selectedTemplate.isFavorite
+                  ? "♥ Saved to Favorites"
+                  : "♡ Add to Favorites"}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </main>
   );
 }
