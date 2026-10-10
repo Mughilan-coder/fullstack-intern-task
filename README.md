@@ -25,7 +25,7 @@ A full-stack web application that allows users to register, log in, browse websi
 
 ### 1. Clone the repository
 ```bash
-git clone YOUR_GITHUB_REPOSITORY_URL
+git clone https://github.com/Mughilan-coder/fullstack-intern-task.git
 cd fullstack-intern-task
 ```
 
@@ -75,9 +75,9 @@ Frontend URL: `http://localhost:5173`
 | GET | `/api/health` | Health check |
 
 ## Author
-**Name:** YOUR NAME
+**Name:** Mughilan M
 
-**Email:** YOUR EMAIL
+**Email:** mughilan404@gmail.com
 
 ## License
 Developed as a software engineering internship technical assignment.
